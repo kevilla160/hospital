@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <div class="container">
@@ -13,17 +13,13 @@
 
 <script>
 function login() {
- fetch("http://localhost:3000/login", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    usuario: document.getElementById("usuario").value,
-    senha: document.getElementById("senha").value
-  })
-})
-
+  fetch("/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      usuario: usuario.value,
+      senha: senha.value
+    })
   })
   .then(r => r.json())
   .then(data => {
@@ -34,5 +30,4 @@ function login() {
 }
 </script>
 </body>
-</html> 
-
+</html>

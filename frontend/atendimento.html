@@ -35,7 +35,14 @@ function cadastrar(){
   body: JSON.stringify({
     nome: nome.value,
     cpf: cpf.value,
-    tipo: tipo.value
+    tipo: tipo.value,
+    data: data.value,
+    responsavel: responsavel.value,
+    estadocivil: estadocivil.value,
+    endereco: endereco.value,
+    telefone: telefone.value,
+    email: email.value,
+    emergencia: emergencia.value
   })
  });
  alert("Paciente enviado para triagem");

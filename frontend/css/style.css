@@ -1,6 +1,6 @@
 body{
   font-family: Arial;
-  background:#f4f6f9;
+  background:#f3eafa;
   margin:0;
 }
 
@@ -11,7 +11,7 @@ body{
   background:white;
   padding:20px;
   border-radius:12px;
-  box-shadow:0 5px 20px rgba(0,0,0,0.1);
+  box-shadow:0 5px 20px rgba(128, 80, 160, 0.15);
 }
 
 input,
@@ -22,7 +22,7 @@ button{
   padding:12px;
   margin-top:10px;
   border-radius:8px;
-  border:1px solid #ccc;
+  border:1px solid #d8c4e8;
   font-size:16px;
 }
 
@@ -32,41 +32,41 @@ textarea{
 }
 
 button{
-  background:#3498db;
+  background:#b57edc;
   color:white;
   border:none;
   cursor:pointer;
 }
 
 button:hover{
-  background:#2980b9;
+  background:#9b59c6;
 }
 
 .card{
-  border:1px solid #ddd;
+  border:1px solid #dfcbed;
   padding:15px;
   margin:15px 0;
   border-radius:10px;
   background:white;
-  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  box-shadow:0 2px 8px rgba(128, 80, 160, 0.1);
 }
 
 .verde{
-  background:#2ecc71;
+  background:#c8a2c8;
   color:white;
   padding:5px 10px;
   border-radius:6px;
 }
 
 .amarelo{
-  background:#f1c40f;
+  background:#d8b4e2;
   padding:5px 10px;
   border-radius:6px;
 }
 
 .vermelho{
-  background:#e74c3c;
+  background:#a66bbd;
   color:white;
   padding:5px 10px;
   border-radius:6px;
-} 
+}

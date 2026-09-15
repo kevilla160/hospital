@@ -5,7 +5,11 @@
 
   <link rel="stylesheet" href="style.css">
 
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
+
     .btn-tv {
       background: #28a745;
       color: white;
@@ -35,7 +39,9 @@
       background: #117a8b;
     }
 
-    .btn-imprimir {
+    /* BOTÃO PDF */
+
+    .btn-pdf {
       background: #dc3545;
       color: white;
       border: none;
@@ -46,7 +52,7 @@
       margin-top: 10px;
     }
 
-    .btn-imprimir:hover {
+    .btn-pdf:hover {
       background: #b02a37;
     }
 
@@ -75,146 +81,16 @@
       border-radius: 4px;
     }
 
-    /* ==============================
-       FORMULÁRIO DE IMPRESSÃO
-       ============================== */
-
-    .formulario-impressao {
-      display: none;
-    }
-
-    @media print {
-
-      /* Esconde a tela normal */
-      body > * {
-        display: none !important;
-      }
-
-      /* Mostra somente o formulário */
-      .formulario-impressao {
-        display: block !important;
-        width: 100%;
-        color: #000;
-        background: #fff;
-        font-family: Arial, sans-serif;
-      }
-
-      .formulario-impressao * {
-        color: #000 !important;
-      }
-
-      .folha {
-        width: 100%;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        box-sizing: border-box;
-      }
-
-      .cabecalho-pdf {
-        text-align: center;
-        border-bottom: 2px solid #000;
-        padding-bottom: 15px;
-        margin-bottom: 25px;
-      }
-
-      .cabecalho-pdf h1 {
-        margin: 0;
-        font-size: 24px;
-      }
-
-      .cabecalho-pdf p {
-        margin: 5px 0;
-        font-size: 13px;
-      }
-
-      .titulo-formulario {
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 25px;
-        text-transform: uppercase;
-      }
-
-      .linha-info {
-        display: flex;
-        gap: 30px;
-        margin-bottom: 15px;
-      }
-
-      .campo {
-        flex: 1;
-      }
-
-      .campo strong {
-        display: block;
-        font-size: 12px;
-        margin-bottom: 5px;
-      }
-
-      .campo .valor {
-        border-bottom: 1px solid #000;
-        min-height: 22px;
-        padding: 3px;
-        font-size: 14px;
-      }
-
-      .campo-grande {
-        margin-top: 20px;
-      }
-
-      .campo-grande strong {
-        display: block;
-        font-size: 12px;
-        margin-bottom: 5px;
-      }
-
-      .area-texto {
-        border: 1px solid #000;
-        min-height: 80px;
-        padding: 10px;
-        font-size: 14px;
-        white-space: pre-wrap;
-      }
-
-      .assinaturas {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 100px;
-        gap: 80px;
-      }
-
-      .assinatura {
-        flex: 1;
-        text-align: center;
-      }
-
-      .linha-assinatura {
-        border-top: 1px solid #000;
-        margin-bottom: 8px;
-      }
-
-      .rodape-impressao {
-        text-align: center;
-        font-size: 10px;
-        margin-top: 50px;
-        border-top: 1px solid #999;
-        padding-top: 10px;
-      }
-
-      @page {
-        size: A4;
-        margin: 15mm;
-      }
-    }
   </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-  <!-- Cabeçalho -->
+  <!-- CABEÇALHO -->
+
   <div style="
     display:flex;
     justify-content:space-between;
@@ -222,46 +98,71 @@
     margin-bottom:20px;
   ">
 
-    <h2 style="margin:0;">🩺 Painel Médico</h2>
+    <h2 style="margin:0;">
+      🩺 Painel Médico
+    </h2>
 
     <button
       class="btn-abrir-tv"
       onclick="window.open('tv.html','_blank')">
+
       📺 Abrir Tela da TV
+
     </button>
 
   </div>
 
-  <!-- Consultório -->
+
+  <!-- CONSULTÓRIO -->
+
   <div class="consultorio-input">
 
-    <label>Meu Consultório:</label>
+    <label>
+      Meu Consultório:
+    </label>
 
     <input
       type="text"
       id="consultorio-num"
       value="01">
 
-    <span style="color:#666; font-size:13px;">
-      Este número será exibido na TV ao chamar o paciente.
+    <span style="
+      color:#666;
+      font-size:13px;
+    ">
+
+      Este número será exibido na TV
+      ao chamar o paciente.
+
     </span>
 
   </div>
 
-  <!-- Lista de triagens -->
+
+  <!-- LISTA DE TRIAGENS -->
+
   <div id="triagens"></div>
+
 
   <hr>
 
-  <h3>Consulta</h3>
+
+  <!-- CONSULTA -->
+
+  <h3>
+    Consulta
+  </h3>
+
 
   <input
     id="paciente"
     placeholder="Paciente">
 
+
   <input
     id="diagnostico"
     placeholder="Diagnóstico">
+
 
   <select id="medicacao">
 
@@ -271,178 +172,43 @@
 
   </select>
 
+
   <textarea
     id="obs"
     placeholder="Observações">
   </textarea>
 
+
   <br>
 
-  <!-- Botão salvar -->
+
+  <!-- SALVAR -->
+
   <button onclick="salvar()">
+
     💾 Salvar Consulta
+
   </button>
 
-  <!-- Botão imprimir -->
+
+  <!-- GERAR PDF -->
+
   <button
-    class="btn-imprimir"
-    onclick="imprimirFormulario()">
-    🖨️ Imprimir Formulário
+    class="btn-pdf"
+    onclick="gerarPDF()">
+
+    📄 Gerar PDF
+
   </button>
-
-</div>
-
-
-<!-- =====================================================
-     FORMULÁRIO QUE SERÁ IMPRESSO
-     ===================================================== -->
-
-<div
-  id="formulario-impressao"
-  class="formulario-impressao">
-
-  <div class="folha">
-
-    <div class="cabecalho-pdf">
-
-      <h1>🩺 PAINEL MÉDICO</h1>
-
-      <p>
-        Formulário de Atendimento Médico
-      </p>
-
-    </div>
-
-
-    <div class="titulo-formulario">
-      Registro de Consulta
-    </div>
-
-
-    <!-- Paciente / Consultório -->
-    <div class="linha-info">
-
-      <div class="campo">
-
-        <strong>PACIENTE</strong>
-
-        <div
-          class="valor"
-          id="imp-paciente">
-        </div>
-
-      </div>
-
-
-      <div class="campo">
-
-        <strong>CONSULTÓRIO</strong>
-
-        <div
-          class="valor"
-          id="imp-consultorio">
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- Data -->
-    <div class="linha-info">
-
-      <div class="campo">
-
-        <strong>DATA DO ATENDIMENTO</strong>
-
-        <div
-          class="valor"
-          id="imp-data">
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- Diagnóstico -->
-    <div class="campo-grande">
-
-      <strong>DIAGNÓSTICO</strong>
-
-      <div
-        class="area-texto"
-        id="imp-diagnostico">
-      </div>
-
-    </div>
-
-
-    <!-- Medicação -->
-    <div class="campo-grande">
-
-      <strong>MEDICAÇÃO / PRESCRIÇÃO</strong>
-
-      <div
-        class="area-texto"
-        id="imp-medicacao">
-      </div>
-
-    </div>
-
-
-    <!-- Observações -->
-    <div class="campo-grande">
-
-      <strong>OBSERVAÇÕES</strong>
-
-      <div
-        class="area-texto"
-        id="imp-obs">
-      </div>
-
-    </div>
-
-
-    <!-- Assinaturas -->
-    <div class="assinaturas">
-
-      <div class="assinatura">
-
-        <div class="linha-assinatura"></div>
-
-        <strong>
-          Assinatura do Médico
-        </strong>
-
-      </div>
-
-
-      <div class="assinatura">
-
-        <div class="linha-assinatura"></div>
-
-        <strong>
-          Data
-        </strong>
-
-      </div>
-
-    </div>
-
-
-    <div class="rodape-impressao">
-
-      Formulário gerado pelo Painel Médico
-
-    </div>
-
-  </div>
 
 </div>
 
 
 <script>
+
+/* =====================================================
+   VARIÁVEIS
+   ===================================================== */
 
 let triagensCarregadas = [];
 
@@ -484,7 +250,9 @@ function carregar() {
 
           <div class="card">
 
-            <h3>${t.nome}</h3>
+            <h3>
+              ${t.nome}
+            </h3>
 
             <p>
               <b>Sintoma:</b>
@@ -512,23 +280,30 @@ function carregar() {
               ${t.observacao || "Nenhuma"}
             </p>
 
-            <div
-              style="
-                display:flex;
-                gap:8px;
-                flex-wrap:wrap;
-              ">
+
+            <div style="
+              display:flex;
+              gap:8px;
+              flex-wrap:wrap;
+            ">
+
 
               <button
                 onclick="selecionar(${index})">
+
                 Atender
+
               </button>
+
 
               <button
                 class="btn-tv"
-                onclick="chamarNaTV('${t.nome}')">
+                onclick="chamarNaTV('${t.nome.replace(/'/g, "\\'")}')">
+
                 📺 Chamar na TV
+
               </button>
+
 
             </div>
 
@@ -559,7 +334,9 @@ function carregar() {
 function chamarNaTV(nome) {
 
   const consultorio =
-    document.getElementById("consultorio-num").value || "01";
+    document.getElementById(
+      "consultorio-num"
+    ).value || "01";
 
 
   fetch("/tv/chamar", {
@@ -622,12 +399,14 @@ function selecionar(index) {
     triagensCarregadas[index];
 
 
-  document.getElementById("paciente").value =
-    t.nome;
+  document.getElementById(
+    "paciente"
+  ).value = t.nome;
 
 
-  document.getElementById("obs").value =
-    t.observacao || "";
+  document.getElementById(
+    "obs"
+  ).value = t.observacao || "";
 
 
   if (
@@ -658,7 +437,9 @@ function carregarMedicacoes() {
     .then(data => {
 
       const select =
-        document.getElementById("medicacao");
+        document.getElementById(
+          "medicacao"
+        );
 
 
       select.innerHTML =
@@ -670,7 +451,9 @@ function carregarMedicacoes() {
       data.forEach(med => {
 
         const option =
-          document.createElement("option");
+          document.createElement(
+            "option"
+          );
 
 
         option.value = med;
@@ -703,16 +486,24 @@ function carregarMedicacoes() {
 function salvar() {
 
   const paciente =
-    document.getElementById("paciente").value;
+    document.getElementById(
+      "paciente"
+    ).value;
 
   const diagnostico =
-    document.getElementById("diagnostico").value;
+    document.getElementById(
+      "diagnostico"
+    ).value;
 
   const medicacao =
-    document.getElementById("medicacao").value;
+    document.getElementById(
+      "medicacao"
+    ).value;
 
   const obs =
-    document.getElementById("obs").value;
+    document.getElementById(
+      "obs"
+    ).value;
 
 
   if (!paciente) {
@@ -758,7 +549,9 @@ function salvar() {
 
   .then(() => {
 
-    alert("Consulta salva");
+    alert(
+      "✅ Consulta salva!"
+    );
 
 
     document.getElementById(
@@ -794,28 +587,44 @@ function salvar() {
 
 
 /* =====================================================
-   IMPRIMIR FORMULÁRIO
+   GERAR PDF
    ===================================================== */
 
-function imprimirFormulario() {
+function gerarPDF() {
 
   const paciente =
-    document.getElementById("paciente").value;
+    document.getElementById(
+      "paciente"
+    ).value.trim();
+
 
   const diagnostico =
-    document.getElementById("diagnostico").value;
+    document.getElementById(
+      "diagnostico"
+    ).value.trim();
+
 
   const medicacao =
-    document.getElementById("medicacao").value;
+    document.getElementById(
+      "medicacao"
+    ).value.trim();
+
 
   const obs =
-    document.getElementById("obs").value;
+    document.getElementById(
+      "obs"
+    ).value.trim();
+
 
   const consultorio =
-    document.getElementById("consultorio-num").value || "01";
+    document.getElementById(
+      "consultorio-num"
+    ).value || "01";
 
 
-  /* Verifica paciente */
+  /* ===================================================
+     VALIDAR PACIENTE
+     =================================================== */
 
   if (!paciente) {
 
@@ -828,55 +637,519 @@ function imprimirFormulario() {
   }
 
 
-  /* Preenche formulário */
+  /* ===================================================
+     CRIAR PDF
+     =================================================== */
 
-  document.getElementById(
-    "imp-paciente"
-  ).textContent =
-    paciente;
-
-
-  document.getElementById(
-    "imp-consultorio"
-  ).textContent =
-    consultorio;
+  const {
+    jsPDF
+  } = window.jspdf;
 
 
-  document.getElementById(
-    "imp-diagnostico"
-  ).textContent =
-    diagnostico || "Não informado";
+  const pdf =
+    new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
 
 
-  document.getElementById(
-    "imp-medicacao"
-  ).textContent =
-    medicacao || "Não informada";
+  const largura =
+    pdf.internal.pageSize.getWidth();
+
+  const altura =
+    pdf.internal.pageSize.getHeight();
 
 
-  document.getElementById(
-    "imp-obs"
-  ).textContent =
-    obs || "Nenhuma";
+  const margem = 20;
+
+  let y = 20;
 
 
-  /* Data atual */
+  /* ===================================================
+     CABEÇALHO
+     =================================================== */
 
-  const agora = new Date();
+  pdf.setFillColor(
+    41,
+    128,
+    185
+  );
+
+  pdf.rect(
+    0,
+    0,
+    largura,
+    35,
+    "F"
+  );
+
+
+  pdf.setTextColor(
+    255,
+    255,
+    255
+  );
+
+
+  pdf.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  pdf.setFontSize(20);
+
+
+  pdf.text(
+    "PAINEL MÉDICO",
+    largura / 2,
+    15,
+    {
+      align: "center"
+    }
+  );
+
+
+  pdf.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  pdf.setFontSize(11);
+
+
+  pdf.text(
+    "Formulário de Atendimento Médico",
+    largura / 2,
+    23,
+    {
+      align: "center"
+    }
+  );
+
+
+  pdf.text(
+    "Registro de Consulta",
+    largura / 2,
+    30,
+    {
+      align: "center"
+    }
+  );
+
+
+  /* ===================================================
+     POSIÇÃO INICIAL
+     =================================================== */
+
+  y = 48;
+
+
+  pdf.setTextColor(
+    0,
+    0,
+    0
+  );
+
+
+  /* ===================================================
+     FUNÇÃO CAMPO
+     =================================================== */
+
+  function campo(
+    titulo,
+    valor,
+    x,
+    larguraCampo
+  ) {
+
+    pdf.setFont(
+      "helvetica",
+      "bold"
+    );
+
+    pdf.setFontSize(9);
+
+    pdf.setTextColor(
+      80,
+      80,
+      80
+    );
+
+
+    pdf.text(
+      titulo,
+      x,
+      y
+    );
+
+
+    pdf.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    pdf.setFontSize(11);
+
+    pdf.setTextColor(
+      0,
+      0,
+      0
+    );
+
+
+    pdf.text(
+      valor || "Não informado",
+      x,
+      y + 7
+    );
+
+
+    pdf.setDrawColor(
+      180,
+      180,
+      180
+    );
+
+
+    pdf.line(
+      x,
+      y + 9,
+      x + larguraCampo,
+      y + 9
+    );
+
+  }
+
+
+  /* ===================================================
+     PACIENTE
+     =================================================== */
+
+  campo(
+    "PACIENTE",
+    paciente,
+    margem,
+    105
+  );
+
+
+  campo(
+    "CONSULTÓRIO",
+    consultorio,
+    140,
+    50
+  );
+
+
+  y += 25;
+
+
+  /* ===================================================
+     DATA
+     =================================================== */
+
+  const agora =
+    new Date();
+
 
   const data =
-    agora.toLocaleDateString("pt-BR");
+    agora.toLocaleDateString(
+      "pt-BR"
+    );
 
 
-  document.getElementById(
-    "imp-data"
-  ).textContent =
-    data;
+  const hora =
+    agora.toLocaleTimeString(
+      "pt-BR",
+      {
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
 
 
-  /* Abre impressão */
+  campo(
+    "DATA DO ATENDIMENTO",
+    data + " - " + hora,
+    margem,
+    170
+  );
 
-  window.print();
+
+  y += 25;
+
+
+  /* ===================================================
+     FUNÇÃO ÁREA DE TEXTO
+     =================================================== */
+
+  function areaTexto(
+    titulo,
+    texto,
+    alturaMinima
+  ) {
+
+    pdf.setFont(
+      "helvetica",
+      "bold"
+    );
+
+    pdf.setFontSize(10);
+
+    pdf.setTextColor(
+      50,
+      50,
+      50
+    );
+
+
+    pdf.text(
+      titulo,
+      margem,
+      y
+    );
+
+
+    y += 5;
+
+
+    const larguraTexto =
+      largura - (
+        margem * 2
+      );
+
+
+    const linhas =
+      pdf.splitTextToSize(
+        texto || "Não informado",
+        larguraTexto - 8
+      );
+
+
+    const alturaTexto =
+      Math.max(
+        alturaMinima,
+        (linhas.length * 5) + 10
+      );
+
+
+    pdf.setDrawColor(
+      120,
+      120,
+      120
+    );
+
+
+    pdf.rect(
+      margem,
+      y,
+      larguraTexto,
+      alturaTexto
+    );
+
+
+    pdf.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    pdf.setFontSize(10);
+
+    pdf.setTextColor(
+      0,
+      0,
+      0
+    );
+
+
+    pdf.text(
+      linhas,
+      margem + 4,
+      y + 7
+    );
+
+
+    y += alturaTexto + 12;
+
+  }
+
+
+  /* ===================================================
+     DIAGNÓSTICO
+     =================================================== */
+
+  areaTexto(
+    "DIAGNÓSTICO",
+    diagnostico,
+    25
+  );
+
+
+  /* ===================================================
+     MEDICAÇÃO
+     =================================================== */
+
+  areaTexto(
+    "MEDICAÇÃO / PRESCRIÇÃO",
+    medicacao,
+    25
+  );
+
+
+  /* ===================================================
+     OBSERVAÇÕES
+     =================================================== */
+
+  areaTexto(
+    "OBSERVAÇÕES",
+    obs,
+    35
+  );
+
+
+  /* ===================================================
+     ASSINATURA
+     =================================================== */
+
+  if (
+    y > altura - 55
+  ) {
+
+    pdf.addPage();
+
+    y = 25;
+
+  }
+
+
+  y += 10;
+
+
+  const larguraAssinatura =
+    70;
+
+
+  pdf.setDrawColor(
+    0,
+    0,
+    0
+  );
+
+
+  pdf.line(
+    margem,
+    y,
+    margem + larguraAssinatura,
+    y
+  );
+
+
+  pdf.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  pdf.setFontSize(9);
+
+
+  pdf.text(
+    "Assinatura do Médico",
+    margem + (
+      larguraAssinatura / 2
+    ),
+    y + 6,
+    {
+      align: "center"
+    }
+  );
+
+
+  /* ===================================================
+     DATA DA ASSINATURA
+     =================================================== */
+
+  const xData =
+    largura - margem - 60;
+
+
+  pdf.line(
+    xData,
+    y,
+    xData + 60,
+    y
+  );
+
+
+  pdf.text(
+    "Data",
+    xData + 30,
+    y + 6,
+    {
+      align: "center"
+    }
+  );
+
+
+  /* ===================================================
+     RODAPÉ
+     =================================================== */
+
+  pdf.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  pdf.setFontSize(8);
+
+  pdf.setTextColor(
+    100,
+    100,
+    100
+  );
+
+
+  pdf.text(
+    "Formulário gerado pelo Painel Médico",
+    largura / 2,
+    altura - 12,
+    {
+      align: "center"
+    }
+  );
+
+
+  /* ===================================================
+     NOME DO ARQUIVO
+     =================================================== */
+
+  const nomeArquivo =
+    paciente
+      .replace(
+        /[^a-zA-Z0-9À-ÿ ]/g,
+        ""
+      )
+      .replace(
+        /\s+/g,
+        "_"
+      );
+
+
+  pdf.save(
+    "Consulta_" +
+    nomeArquivo +
+    "_" +
+    data.replace(
+      /\//g,
+      "-"
+    ) +
+    ".pdf"
+  );
+
+
+  alert(
+    "✅ PDF gerado com sucesso!"
+  );
 
 }
 
@@ -890,7 +1163,9 @@ carregar();
 carregarMedicacoes();
 
 
-/* Atualiza a lista a cada 10 segundos */
+/* =====================================================
+   ATUALIZAR FILA
+   ===================================================== */
 
 setInterval(
   carregar,

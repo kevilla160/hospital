@@ -2,84 +2,256 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+
   <title>Painel Médico</title>
 
   <link rel="stylesheet" href="style.css">
 
+  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f4f6f9;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 800px;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    }
+
+    .topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .topo h2 {
+      margin: 0;
+    }
+
+    .consultorio {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: #f0f4ff;
+      border-radius: 6px;
+    }
+
+    .consultorio input {
+      width: 60px;
+      text-align: center;
+      font-size: 18px;
+      padding: 5px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    button {
+      padding: 9px 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      margin: 3px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .btn-tv {
+      background: #28a745;
+    }
+
+    .btn-abrir-tv {
+      background: #17a2b8;
+    }
+
+    .btn-pdf {
+      background: #dc3545;
+    }
+
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 7px;
+      padding: 15px;
+      margin-bottom: 10px;
+      background: #fafafa;
+    }
+
+    hr {
+      margin: 25px 0;
+      border: 0;
+      border-top: 1px solid #ddd;
+    }
+
+  </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-  <h2>🩺 Painel Médico</h2>
+  <!-- CABEÇALHO -->
+
+  <div class="topo">
+
+    <h2>🩺 Painel Médico</h2>
+
+    <button
+      class="btn-abrir-tv"
+      onclick="window.open('tv.html','_blank')">
+
+      📺 Abrir Tela da TV
+
+    </button>
+
+  </div>
+
 
   <!-- CONSULTÓRIO -->
-  <label>Consultório:</label>
-  <input id="consultorio" value="01" maxlength="3">
 
-  <button onclick="window.open('tv.html','_blank')">
-    📺 Abrir TV
-  </button>
+  <div class="consultorio">
 
-  <hr>
+    <strong>Meu Consultório:</strong>
+
+    <input
+      type="text"
+      id="consultorio"
+      value="01"
+      maxlength="3">
+
+    <span>
+      Número exibido na TV
+    </span>
+
+  </div>
+
 
   <!-- FILA -->
+
   <h3>Fila de Pacientes</h3>
+
   <div id="triagens"></div>
+
 
   <hr>
 
+
   <!-- CONSULTA -->
+
   <h3>Consulta</h3>
 
-  <input id="paciente" placeholder="Paciente">
+  <input
+    id="paciente"
+    placeholder="Paciente">
 
-  <input id="diagnostico" placeholder="Diagnóstico">
+  <input
+    id="diagnostico"
+    placeholder="Diagnóstico">
 
   <select id="medicacao">
-    <option value="">Selecione a medicação</option>
+
+    <option value="">
+      Selecione a medicação
+    </option>
+
   </select>
 
-  <textarea id="obs" placeholder="Observações"></textarea>
+  <textarea
+    id="obs"
+    placeholder="Observações"></textarea>
 
-  <br>
 
   <button onclick="salvar()">
     💾 Salvar Consulta
   </button>
 
-  <button onclick="gerarPDF()">
+
+  <button
+    class="btn-pdf"
+    onclick="gerarPDF()">
+
     📄 Gerar PDF
+
   </button>
 
 </div>
 
+
 <script>
+
+/* =====================================================
+   VARIÁVEIS
+===================================================== */
 
 let triagens = [];
 
-/* CARREGAR FILA */
+
+/* =====================================================
+   CARREGAR TRIAGENS
+===================================================== */
+
 function carregar() {
 
   fetch("/triagens")
+
     .then(r => r.json())
+
     .then(data => {
 
       triagens = data;
 
-      const div = document.getElementById("triagens");
+      const div =
+        document.getElementById("triagens");
+
       div.innerHTML = "";
 
       if (!data.length) {
-        div.innerHTML = "<p>Nenhum paciente na fila.</p>";
+
+        div.innerHTML =
+          "<p style='text-align:center;color:#888'>" +
+          "Nenhum paciente na fila." +
+          "</p>";
+
         return;
       }
+
 
       data.forEach((p, i) => {
 
         div.innerHTML += `
+
           <div class="card">
 
             <h3>${p.nome}</h3>
@@ -99,47 +271,81 @@ function carregar() {
               ${p.risco || "Não informado"}
             </p>
 
+            <p>
+              <b>Alergia:</b>
+              ${p.alergia || "Nenhuma"}
+            </p>
+
             <button onclick="atender(${i})">
               Atender
             </button>
 
-            <button onclick="chamarTV(${i})">
-              📺 Chamar
+            <button
+              class="btn-tv"
+              onclick="chamarTV(${i})">
+
+              📺 Chamar na TV
+
             </button>
 
           </div>
+
         `;
 
       });
 
     })
-    .catch(() => {
-      console.log("Erro ao carregar fila.");
+
+    .catch(error => {
+
+      console.error(error);
+
     });
+
 }
 
 
-/* ATENDER */
+/* =====================================================
+   ATENDER
+===================================================== */
+
 function atender(i) {
 
   const p = triagens[i];
 
-  document.getElementById("paciente").value = p.nome;
-  document.getElementById("obs").value = p.observacao || "";
+  document.getElementById("paciente").value =
+    p.nome;
 
-  if (p.alergia && p.alergia !== "Nenhuma") {
-    alert("⚠️ Alergia: " + p.alergia);
+  document.getElementById("obs").value =
+    p.observacao || "";
+
+  if (
+    p.alergia &&
+    p.alergia !== "Nenhuma"
+  ) {
+
+    alert(
+      "⚠️ Paciente possui alergia: " +
+      p.alergia
+    );
+
   }
+
 }
 
 
-/* CHAMAR NA TV */
+/* =====================================================
+   CHAMAR NA TV
+===================================================== */
+
 function chamarTV(i) {
 
   const p = triagens[i];
 
   const consultorio =
-    document.getElementById("consultorio").value || "01";
+    document.getElementById("consultorio").value ||
+    "01";
+
 
   fetch("/tv/chamar", {
 
@@ -150,26 +356,49 @@ function chamarTV(i) {
     },
 
     body: JSON.stringify({
+
       localTipo: "CONSULTÓRIO",
+
       localNumero: consultorio,
+
       paciente: p.nome
+
     })
 
   })
+
   .then(() => {
-    alert("Paciente chamado na TV.");
+
+    alert(
+      "✅ " +
+      p.nome +
+      " foi chamado no Consultório " +
+      consultorio
+    );
+
   })
+
   .catch(() => {
-    alert("Erro ao chamar paciente.");
+
+    alert(
+      "❌ Erro ao chamar paciente."
+    );
+
   });
+
 }
 
 
-/* CARREGAR MEDICAÇÕES */
+/* =====================================================
+   CARREGAR MEDICAÇÕES
+===================================================== */
+
 function carregarMedicacoes() {
 
   fetch("/lista-medicacoes")
+
     .then(r => r.json())
+
     .then(data => {
 
       const select =
@@ -181,6 +410,7 @@ function carregarMedicacoes() {
           document.createElement("option");
 
         option.value = med;
+
         option.textContent = med;
 
         select.appendChild(option);
@@ -188,10 +418,14 @@ function carregarMedicacoes() {
       });
 
     });
+
 }
 
 
-/* SALVAR CONSULTA */
+/* =====================================================
+   SALVAR CONSULTA
+===================================================== */
+
 function salvar() {
 
   const paciente =
@@ -206,10 +440,28 @@ function salvar() {
   const obs =
     document.getElementById("obs").value;
 
+
   if (!paciente) {
-    alert("Selecione um paciente.");
+
+    alert(
+      "Selecione um paciente."
+    );
+
     return;
+
   }
+
+
+  if (!medicacao) {
+
+    alert(
+      "Selecione uma medicação."
+    );
+
+    return;
+
+  }
+
 
   fetch("/consulta", {
 
@@ -220,100 +472,578 @@ function salvar() {
     },
 
     body: JSON.stringify({
+
       paciente,
       diagnostico,
       medicacao,
       obs
+
     })
 
   })
+
   .then(() => {
-    alert("✅ Consulta salva.");
+
+    alert(
+      "✅ Consulta salva!"
+    );
+
   })
+
   .catch(() => {
-    alert("❌ Erro ao salvar.");
+
+    alert(
+      "❌ Erro ao salvar consulta."
+    );
+
   });
+
 }
 
 
-/* GERAR PDF */
+/* =====================================================
+   GERAR PDF
+===================================================== */
+
 function gerarPDF() {
 
   const paciente =
-    document.getElementById("paciente").value;
+    document.getElementById(
+      "paciente"
+    ).value.trim();
+
 
   const diagnostico =
-    document.getElementById("diagnostico").value;
+    document.getElementById(
+      "diagnostico"
+    ).value.trim();
+
 
   const medicacao =
-    document.getElementById("medicacao").value;
+    document.getElementById(
+      "medicacao"
+    ).value.trim();
+
 
   const obs =
-    document.getElementById("obs").value;
+    document.getElementById(
+      "obs"
+    ).value.trim();
+
+
+  const consultorio =
+    document.getElementById(
+      "consultorio"
+    ).value || "01";
+
 
   if (!paciente) {
-    alert("Selecione um paciente.");
+
+    alert(
+      "Selecione um paciente clicando em Atender."
+    );
+
     return;
+
   }
 
-  const { jsPDF } = window.jspdf;
 
-  const pdf = new jsPDF();
+  const {
+    jsPDF
+  } = window.jspdf;
+
+
+  const pdf =
+    new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+
+  const largura =
+    pdf.internal.pageSize.getWidth();
+
+  const altura =
+    pdf.internal.pageSize.getHeight();
+
+
+  const margem = 20;
 
   let y = 20;
 
-  pdf.setFontSize(18);
-  pdf.text("PAINEL MÉDICO", 105, y, {
-    align: "center"
-  });
 
-  y += 15;
+  /* CABEÇALHO */
 
-  pdf.setFontSize(12);
+  pdf.setFillColor(
+    41,
+    128,
+    185
+  );
 
-  pdf.text("Paciente: " + paciente, 20, y);
-  y += 10;
+  pdf.rect(
+    0,
+    0,
+    largura,
+    35,
+    "F"
+  );
 
-  pdf.text("Diagnóstico: " + (diagnostico || "Não informado"), 20, y);
-  y += 10;
 
-  pdf.text("Medicação: " + (medicacao || "Não informado"), 20, y);
-  y += 10;
+  pdf.setTextColor(
+    255,
+    255,
+    255
+  );
 
-  pdf.text("Observações:", 20, y);
-  y += 7;
 
-  const linhas =
-    pdf.splitTextToSize(
-      obs || "Nenhuma",
-      170
-    );
+  pdf.setFont(
+    "helvetica",
+    "bold"
+  );
 
-  pdf.text(linhas, 20, y);
+  pdf.setFontSize(20);
 
-  y += linhas.length * 6 + 15;
 
   pdf.text(
-    "Data: " +
-    new Date().toLocaleDateString("pt-BR"),
-    20,
+    "PAINEL MÉDICO",
+    largura / 2,
+    15,
+    {
+      align: "center"
+    }
+  );
+
+
+  pdf.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  pdf.setFontSize(11);
+
+
+  pdf.text(
+    "Formulário de Atendimento Médico",
+    largura / 2,
+    23,
+    {
+      align: "center"
+    }
+  );
+
+
+  pdf.text(
+    "Registro de Consulta",
+    largura / 2,
+    30,
+    {
+      align: "center"
+    }
+  );
+
+
+  y = 48;
+
+
+  pdf.setTextColor(
+    0,
+    0,
+    0
+  );
+
+
+  /* CAMPO */
+
+  function campo(
+    titulo,
+    valor,
+    x,
+    larguraCampo
+  ) {
+
+    pdf.setFont(
+      "helvetica",
+      "bold"
+    );
+
+    pdf.setFontSize(9);
+
+    pdf.setTextColor(
+      80,
+      80,
+      80
+    );
+
+
+    pdf.text(
+      titulo,
+      x,
+      y
+    );
+
+
+    pdf.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    pdf.setFontSize(11);
+
+    pdf.setTextColor(
+      0,
+      0,
+      0
+    );
+
+
+    pdf.text(
+      valor || "Não informado",
+      x,
+      y + 7
+    );
+
+
+    pdf.setDrawColor(
+      180,
+      180,
+      180
+    );
+
+
+    pdf.line(
+      x,
+      y + 9,
+      x + larguraCampo,
+      y + 9
+    );
+
+  }
+
+
+  /* PACIENTE */
+
+  campo(
+    "PACIENTE",
+    paciente,
+    margem,
+    105
+  );
+
+
+  campo(
+    "CONSULTÓRIO",
+    consultorio,
+    140,
+    50
+  );
+
+
+  y += 25;
+
+
+  /* DATA */
+
+  const agora =
+    new Date();
+
+
+  const data =
+    agora.toLocaleDateString(
+      "pt-BR"
+    );
+
+
+  const hora =
+    agora.toLocaleTimeString(
+      "pt-BR",
+      {
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
+
+
+  campo(
+    "DATA DO ATENDIMENTO",
+    data + " - " + hora,
+    margem,
+    170
+  );
+
+
+  y += 25;
+
+
+  /* ÁREA DE TEXTO */
+
+  function areaTexto(
+    titulo,
+    texto,
+    alturaMinima
+  ) {
+
+    pdf.setFont(
+      "helvetica",
+      "bold"
+    );
+
+    pdf.setFontSize(10);
+
+    pdf.setTextColor(
+      50,
+      50,
+      50
+    );
+
+
+    pdf.text(
+      titulo,
+      margem,
+      y
+    );
+
+
+    y += 5;
+
+
+    const larguraTexto =
+      largura - (
+        margem * 2
+      );
+
+
+    const linhas =
+      pdf.splitTextToSize(
+        texto || "Não informado",
+        larguraTexto - 8
+      );
+
+
+    const alturaTexto =
+      Math.max(
+        alturaMinima,
+        (linhas.length * 5) + 10
+      );
+
+
+    pdf.setDrawColor(
+      120,
+      120,
+      120
+    );
+
+
+    pdf.rect(
+      margem,
+      y,
+      larguraTexto,
+      alturaTexto
+    );
+
+
+    pdf.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    pdf.setFontSize(10);
+
+    pdf.setTextColor(
+      0,
+      0,
+      0
+    );
+
+
+    pdf.text(
+      linhas,
+      margem + 4,
+      y + 7
+    );
+
+
+    y += alturaTexto + 12;
+
+  }
+
+
+  /* DIAGNÓSTICO */
+
+  areaTexto(
+    "DIAGNÓSTICO",
+    diagnostico,
+    25
+  );
+
+
+  /* MEDICAÇÃO */
+
+  areaTexto(
+    "MEDICAÇÃO / PRESCRIÇÃO",
+    medicacao,
+    25
+  );
+
+
+  /* OBSERVAÇÕES */
+
+  areaTexto(
+    "OBSERVAÇÕES",
+    obs,
+    35
+  );
+
+
+  /* ASSINATURA */
+
+  if (
+    y > altura - 55
+  ) {
+
+    pdf.addPage();
+
+    y = 25;
+
+  }
+
+
+  y += 10;
+
+
+  const larguraAssinatura = 70;
+
+
+  pdf.setDrawColor(
+    0,
+    0,
+    0
+  );
+
+
+  pdf.line(
+    margem,
+    y,
+    margem + larguraAssinatura,
     y
   );
 
+
+  pdf.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  pdf.setFontSize(9);
+
+
+  pdf.text(
+    "Assinatura do Médico",
+    margem + (
+      larguraAssinatura / 2
+    ),
+    y + 6,
+    {
+      align: "center"
+    }
+  );
+
+
+  /* DATA */
+
+  const xData =
+    largura - margem - 60;
+
+
+  pdf.line(
+    xData,
+    y,
+    xData + 60,
+    y
+  );
+
+
+  pdf.text(
+    "Data",
+    xData + 30,
+    y + 6,
+    {
+      align: "center"
+    }
+  );
+
+
+  /* RODAPÉ */
+
+  pdf.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  pdf.setFontSize(8);
+
+  pdf.setTextColor(
+    100,
+    100,
+    100
+  );
+
+
+  pdf.text(
+    "Formulário gerado pelo Painel Médico",
+    largura / 2,
+    altura - 12,
+    {
+      align: "center"
+    }
+  );
+
+
+  /* SALVAR */
+
+  const nomeArquivo =
+    paciente
+      .replace(
+        /[^a-zA-Z0-9À-ÿ ]/g,
+        ""
+      )
+      .replace(
+        /\s+/g,
+        "_"
+      );
+
+
   pdf.save(
     "Consulta_" +
-    paciente.replace(/\s+/g, "_") +
+    nomeArquivo +
+    "_" +
+    data.replace(
+      /\//g,
+      "-"
+    ) +
     ".pdf"
   );
+
+
+  alert(
+    "✅ PDF gerado com sucesso!"
+  );
+
 }
 
 
-/* INICIAR */
+/* =====================================================
+   INICIAR
+===================================================== */
+
 carregar();
+
 carregarMedicacoes();
 
-/* ATUALIZAR FILA */
-setInterval(carregar, 10000);
+setInterval(
+  carregar,
+  10000
+);
 
 </script>
 

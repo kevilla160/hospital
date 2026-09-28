@@ -1,52 +1,510 @@
 <!DOCTYPE html>
-<html>
-<head><link rel="stylesheet" href="/css/atendimento.css"></head>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Atendimento</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+            background: #f2f4f7;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h3 {
+            margin-top: 25px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .check input {
+            width: auto;
+            margin: 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 20px;
+
+            border: none;
+            border-radius: 7px;
+
+            background: #007bff;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #resultado {
+            margin-top: 20px;
+        }
+
+        .risco {
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .vermelho {
+            background: #dc3545;
+            color: white;
+        }
+
+        .amarelo {
+            background: #ffc107;
+            color: black;
+        }
+
+        .verde {
+            background: #28a745;
+            color: white;
+        }
+
+        .erro {
+            color: #dc3545;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+
 <body>
+
 <div class="container">
-<h2>Atendimento</h2>
 
-<input id="nome" placeholder="Nome">
-<input id="cpf" placeholder="CPF">
-<input id="data" placeholder="data">
-<input id="sexo" placeholder="sexo">
-<input id="nome da mae" placeholder="nome da mae">
-<input id="estado civil" placeholder="estado civil">
-<input id="endereo" placeholder="endereco">
-<input id="telefone" placeholder="telefone">
-<input id="e-mail" placeholder="e-mail">
-<input id="contato de emergencia" placeholder="contato de emergencia">
-  
+    <h2>Atendimento</h2>
 
-<select id="tipo">
-  <option>Convenio</option>
-  <option>Particular</option>
-</select>
+    <!-- DADOS DO PACIENTE -->
 
+    <input
+        type="text"
+        id="nome"
+        placeholder="Nome completo"
+    >
 
+    <input
+        type="text"
+        id="cpf"
+        placeholder="CPF"
+    >
 
-<button onclick="cadastrar()">Cadastrar</button>
+    <label>Data de nascimento</label>
+
+    <input
+        type="date"
+        id="dataNascimento"
+    >
+
+    <!-- SINAIS VITAIS -->
+
+    <h3>Sinais vitais</h3>
+
+    <input
+        type="text"
+        id="pressao"
+        placeholder="Pressão arterial - exemplo: 120/80"
+    >
+
+    <input
+        type="number"
+        id="temperatura"
+        placeholder="Temperatura °C"
+        step="0.1"
+    >
+
+    <input
+        type="number"
+        id="saturacao"
+        placeholder="Saturação de O₂ (%)"
+    >
+
+    <input
+        type="number"
+        id="frequencia"
+        placeholder="Frequência cardíaca (bpm)"
+    >
+
+    <!-- SINTOMAS -->
+
+    <h3>Sintomas / sinais de alerta</h3>
+
+    <label class="check">
+        <input type="checkbox" id="faltaAr">
+        Dificuldade para respirar
+    </label>
+
+    <label class="check">
+        <input type="checkbox" id="dorPeito">
+        Dor no peito intensa
+    </label>
+
+    <label class="check">
+        <input type="checkbox" id="inconsciente">
+        Alteração importante da consciência
+    </label>
+
+    <label class="check">
+        <input type="checkbox" id="sangramento">
+        Sangramento intenso
+    </label>
+
+    <label class="check">
+        <input type="checkbox" id="dorIntensa">
+        Dor intensa
+    </label>
+
+    <label class="check">
+        <input type="checkbox" id="febre">
+        Febre
+    </label>
+
+    <!-- TIPO DE ATENDIMENTO -->
+
+    <h3>Tipo de atendimento</h3>
+
+    <select id="tipo">
+        <option value="Convenio">Convênio</option>
+        <option value="Particular">Particular</option>
+    </select>
+
+    <!-- FOTO -->
+
+    <h3>Foto</h3>
+
+    <input
+        type="file"
+        id="foto"
+        accept="image/*"
+    >
+
+    <!-- BOTÃO -->
+
+    <button onclick="cadastrar()">
+        Cadastrar paciente
+    </button>
+
+    <!-- RESULTADO -->
+
+    <div id="resultado"></div>
+
 </div>
 
+
 <script>
-function cadastrar(){
- fetch("http://localhost:3000/atendimento",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body: JSON.stringify({
-    nome: nome.value,
-    cpf: cpf.value,
-    tipo: tipo.value,
-    data: data.value,
-    responsavel: responsavel.value,
-    estadocivil: estadocivil.value,
-    endereco: endereco.value,
-    telefone: telefone.value,
-    email: email.value,
-    emergencia: emergencia.value
-  })
- });
- alert("Paciente enviado para triagem");
+
+function identificarRisco() {
+
+    /*
+     * ATENÇÃO:
+     * Esta é uma regra demonstrativa.
+     * Em um sistema real, utilize o protocolo
+     * de classificação de risco adotado pelo serviço.
+     */
+
+    const faltaAr =
+        document.getElementById("faltaAr").checked;
+
+    const dorPeito =
+        document.getElementById("dorPeito").checked;
+
+    const inconsciente =
+        document.getElementById("inconsciente").checked;
+
+    const sangramento =
+        document.getElementById("sangramento").checked;
+
+    const dorIntensa =
+        document.getElementById("dorIntensa").checked;
+
+    const febre =
+        document.getElementById("febre").checked;
+
+    const saturacao =
+        Number(document.getElementById("saturacao").value);
+
+    const temperatura =
+        Number(document.getElementById("temperatura").value);
+
+
+    // ==========================================
+    // 🔴 VERMELHO
+    // ==========================================
+
+    if (
+        faltaAr ||
+        dorPeito ||
+        inconsciente ||
+        sangramento
+    ) {
+
+        return "vermelho";
+    }
+
+
+    // ==========================================
+    // 🟡 AMARELO
+    // ==========================================
+
+    if (
+        dorIntensa ||
+        febre ||
+        (saturacao > 0 && saturacao < 94) ||
+        (temperatura >= 39)
+    ) {
+
+        return "amarelo";
+    }
+
+
+    // ==========================================
+    // 🟢 VERDE
+    // ==========================================
+
+    return "verde";
 }
+
+
+function mostrarRisco(risco) {
+
+    const resultado =
+        document.getElementById("resultado");
+
+
+    let texto = "";
+
+    if (risco === "vermelho") {
+
+        texto = "🔴 VERMELHO - Prioridade máxima";
+
+    }
+
+    else if (risco === "amarelo") {
+
+        texto = "🟡 AMARELO - Atendimento prioritário";
+
+    }
+
+    else {
+
+        texto = "🟢 VERDE - Baixa prioridade";
+
+    }
+
+
+    resultado.innerHTML = `
+        <div class="risco ${risco}">
+            ${texto}
+        </div>
+    `;
+}
+
+
+async function cadastrar() {
+
+    const nome =
+        document.getElementById("nome").value.trim();
+
+    const cpf =
+        document.getElementById("cpf").value.trim();
+
+    const dataNascimento =
+        document.getElementById("dataNascimento").value;
+
+    const tipo =
+        document.getElementById("tipo").value;
+
+
+    // ==========================================
+    // VALIDAÇÃO
+    // ==========================================
+
+    if (!nome) {
+
+        alert("Digite o nome do paciente.");
+
+        return;
+    }
+
+    if (!cpf) {
+
+        alert("Digite o CPF.");
+
+        return;
+    }
+
+    if (!dataNascimento) {
+
+        alert("Digite a data de nascimento.");
+
+        return;
+    }
+
+
+    // ==========================================
+    // CLASSIFICAÇÃO
+    // ==========================================
+
+    const risco = identificarRisco();
+
+
+    // Mostra imediatamente na tela
+
+    mostrarRisco(risco);
+
+
+    // ==========================================
+    // DADOS
+    // ==========================================
+
+    const dados = {
+
+        nome: nome,
+
+        cpf: cpf,
+
+        dataNascimento: dataNascimento,
+
+        tipo: tipo,
+
+        risco: risco,
+
+        sinaisVitais: {
+
+            pressao:
+                document.getElementById("pressao").value,
+
+            temperatura:
+                document.getElementById("temperatura").value,
+
+            saturacao:
+                document.getElementById("saturacao").value,
+
+            frequencia:
+                document.getElementById("frequencia").value
+        },
+
+        sintomas: {
+
+            faltaAr:
+                document.getElementById("faltaAr").checked,
+
+            dorPeito:
+                document.getElementById("dorPeito").checked,
+
+            inconsciente:
+                document.getElementById("inconsciente").checked,
+
+            sangramento:
+                document.getElementById("sangramento").checked,
+
+            dorIntensa:
+                document.getElementById("dorIntensa").checked,
+
+            febre:
+                document.getElementById("febre").checked
+        }
+
+    };
+
+
+    // ==========================================
+    // ENVIA PARA O BACKEND
+    // ==========================================
+
+    try {
+
+        const resposta = await fetch(
+            "http://localhost:3000/atendimento",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(dados)
+            }
+        );
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                "Erro HTTP: " + resposta.status
+            );
+        }
+
+
+        alert(
+            "Paciente cadastrado!\n\n" +
+            "Classificação: " +
+            risco.toUpperCase()
+        );
+
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        document.getElementById("resultado").innerHTML += `
+            <p class="erro">
+                Não foi possível conectar ao servidor.
+            </p>
+        `;
+
+    }
+
+}
+
 </script>
+
 </body>
+
 </html>

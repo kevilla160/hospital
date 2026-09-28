@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
@@ -13,7 +13,7 @@
 
 <script>
 function login() {
-  fetch("/login", {
+  fetch("http://localhost:3000/login", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({

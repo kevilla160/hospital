@@ -2,342 +2,144 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <title>Painel Médico</title>
 
   <link rel="stylesheet" href="style.css">
 
-  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <style>
-
-    .btn-tv {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-top: 8px;
-    }
-
-    .btn-tv:hover {
-      background: #1e7e34;
-    }
-
-    .btn-abrir-tv {
-      background: #17a2b8;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 5px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .btn-abrir-tv:hover {
-      background: #117a8b;
-    }
-
-    /* BOTÃO PDF */
-
-    .btn-pdf {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 5px;
-      font-size: 14px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    .btn-pdf:hover {
-      background: #b02a37;
-    }
-
-    .consultorio-input {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-      background: #f0f4ff;
-      padding: 10px 14px;
-      border-radius: 6px;
-      border: 1px solid #d0d8f0;
-    }
-
-    .consultorio-input label {
-      font-weight: bold;
-    }
-
-    .consultorio-input input {
-      width: 60px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      padding: 4px 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-  </style>
-
 </head>
 
 <body>
 
 <div class="container">
 
-  <!-- CABEÇALHO -->
-
-  <div style="
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-  ">
-
-    <h2 style="margin:0;">
-      🩺 Painel Médico
-    </h2>
-
-    <button
-      class="btn-abrir-tv"
-      onclick="window.open('tv.html','_blank')">
-
-      📺 Abrir Tela da TV
-
-    </button>
-
-  </div>
-
+  <h2>🩺 Painel Médico</h2>
 
   <!-- CONSULTÓRIO -->
+  <label>Consultório:</label>
+  <input id="consultorio" value="01" maxlength="3">
 
-  <div class="consultorio-input">
-
-    <label>
-      Meu Consultório:
-    </label>
-
-    <input
-      type="text"
-      id="consultorio-num"
-      value="01">
-
-    <span style="
-      color:#666;
-      font-size:13px;
-    ">
-
-      Este número será exibido na TV
-      ao chamar o paciente.
-
-    </span>
-
-  </div>
-
-
-  <!-- LISTA DE TRIAGENS -->
-
-  <div id="triagens"></div>
-
+  <button onclick="window.open('tv.html','_blank')">
+    📺 Abrir TV
+  </button>
 
   <hr>
 
+  <!-- FILA -->
+  <h3>Fila de Pacientes</h3>
+  <div id="triagens"></div>
+
+  <hr>
 
   <!-- CONSULTA -->
+  <h3>Consulta</h3>
 
-  <h3>
-    Consulta
-  </h3>
+  <input id="paciente" placeholder="Paciente">
 
-
-  <input
-    id="paciente"
-    placeholder="Paciente">
-
-
-  <input
-    id="diagnostico"
-    placeholder="Diagnóstico">
-
+  <input id="diagnostico" placeholder="Diagnóstico">
 
   <select id="medicacao">
-
-    <option value="">
-      Selecione a medicação
-    </option>
-
+    <option value="">Selecione a medicação</option>
   </select>
 
-
-  <textarea
-    id="obs"
-    placeholder="Observações">
-  </textarea>
-
+  <textarea id="obs" placeholder="Observações"></textarea>
 
   <br>
 
-
-  <!-- SALVAR -->
-
   <button onclick="salvar()">
-
     💾 Salvar Consulta
-
   </button>
 
-
-  <!-- GERAR PDF -->
-
-  <button
-    class="btn-pdf"
-    onclick="gerarPDF()">
-
+  <button onclick="gerarPDF()">
     📄 Gerar PDF
-
   </button>
 
 </div>
 
-
 <script>
 
-/* =====================================================
-   VARIÁVEIS
-   ===================================================== */
+let triagens = [];
 
-let triagensCarregadas = [];
-
-
-/* =====================================================
-   CARREGAR TRIAGENS
-   ===================================================== */
-
+/* CARREGAR FILA */
 function carregar() {
 
   fetch("/triagens")
-
     .then(r => r.json())
-
     .then(data => {
 
-      triagensCarregadas = data;
+      triagens = data;
 
-      const div =
-        document.getElementById("triagens");
-
+      const div = document.getElementById("triagens");
       div.innerHTML = "";
 
-
-      if (data.length === 0) {
-
-        div.innerHTML =
-          "<p style='color:#888; text-align:center;'>" +
-          "Nenhum paciente na fila." +
-          "</p>";
-
+      if (!data.length) {
+        div.innerHTML = "<p>Nenhum paciente na fila.</p>";
         return;
       }
 
-
-      data.forEach((t, index) => {
+      data.forEach((p, i) => {
 
         div.innerHTML += `
-
           <div class="card">
 
-            <h3>
-              ${t.nome}
-            </h3>
+            <h3>${p.nome}</h3>
 
             <p>
               <b>Sintoma:</b>
-              ${t.sintoma || "Não informado"}
+              ${p.sintoma || "Não informado"}
             </p>
 
             <p>
               <b>Temperatura:</b>
-              ${t.temperatura || "Não informada"}°C
+              ${p.temperatura || "Não informada"}°C
             </p>
 
             <p>
-              <span class="${t.risco}">
-                ${t.risco}
-              </span>
+              <b>Risco:</b>
+              ${p.risco || "Não informado"}
             </p>
 
-            <p>
-              <b>Alergia:</b>
-              ${t.alergia || "Nenhuma"}
-            </p>
+            <button onclick="atender(${i})">
+              Atender
+            </button>
 
-            <p>
-              <b>Observação:</b>
-              ${t.observacao || "Nenhuma"}
-            </p>
-
-
-            <div style="
-              display:flex;
-              gap:8px;
-              flex-wrap:wrap;
-            ">
-
-
-              <button
-                onclick="selecionar(${index})">
-
-                Atender
-
-              </button>
-
-
-              <button
-                class="btn-tv"
-                onclick="chamarNaTV('${t.nome.replace(/'/g, "\\'")}')">
-
-                📺 Chamar na TV
-
-              </button>
-
-
-            </div>
+            <button onclick="chamarTV(${i})">
+              📺 Chamar
+            </button>
 
           </div>
-
         `;
 
       });
 
     })
-
-    .catch(error => {
-
-      console.error(
-        "Erro ao carregar triagens:",
-        error
-      );
-
+    .catch(() => {
+      console.log("Erro ao carregar fila.");
     });
-
 }
 
 
-/* =====================================================
-   CHAMAR PACIENTE NA TV
-   ===================================================== */
+/* ATENDER */
+function atender(i) {
 
-function chamarNaTV(nome) {
+  const p = triagens[i];
+
+  document.getElementById("paciente").value = p.nome;
+  document.getElementById("obs").value = p.observacao || "";
+
+  if (p.alergia && p.alergia !== "Nenhuma") {
+    alert("⚠️ Alergia: " + p.alergia);
+  }
+}
+
+
+/* CHAMAR NA TV */
+function chamarTV(i) {
+
+  const p = triagens[i];
 
   const consultorio =
-    document.getElementById(
-      "consultorio-num"
-    ).value || "01";
-
+    document.getElementById("consultorio").value || "01";
 
   fetch("/tv/chamar", {
 
@@ -348,183 +150,66 @@ function chamarNaTV(nome) {
     },
 
     body: JSON.stringify({
-
       localTipo: "CONSULTÓRIO",
-
       localNumero: consultorio,
-
-      paciente: nome
-
+      paciente: p.nome
     })
 
   })
-
-  .then(r => r.json())
-
   .then(() => {
-
-    alert(
-      "✅ " +
-      nome +
-      " foi chamado na TV para o Consultório " +
-      consultorio +
-      "!"
-    );
-
+    alert("Paciente chamado na TV.");
   })
-
-  .catch(error => {
-
-    console.error(
-      "Erro ao chamar paciente:",
-      error
-    );
-
-    alert(
-      "❌ Erro ao chamar paciente na TV."
-    );
-
+  .catch(() => {
+    alert("Erro ao chamar paciente.");
   });
-
 }
 
 
-/* =====================================================
-   SELECIONAR PACIENTE
-   ===================================================== */
-
-function selecionar(index) {
-
-  const t =
-    triagensCarregadas[index];
-
-
-  document.getElementById(
-    "paciente"
-  ).value = t.nome;
-
-
-  document.getElementById(
-    "obs"
-  ).value = t.observacao || "";
-
-
-  if (
-    t.alergia &&
-    t.alergia !== "Nenhuma"
-  ) {
-
-    alert(
-      "⚠️ Paciente possui alergia: " +
-      t.alergia
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   CARREGAR MEDICAÇÕES
-   ===================================================== */
-
+/* CARREGAR MEDICAÇÕES */
 function carregarMedicacoes() {
 
   fetch("/lista-medicacoes")
-
     .then(r => r.json())
-
     .then(data => {
 
       const select =
-        document.getElementById(
-          "medicacao"
-        );
-
-
-      select.innerHTML =
-        `<option value="">
-          Selecione a medicação
-        </option>`;
-
+        document.getElementById("medicacao");
 
       data.forEach(med => {
 
         const option =
-          document.createElement(
-            "option"
-          );
-
+          document.createElement("option");
 
         option.value = med;
-
         option.textContent = med;
-
 
         select.appendChild(option);
 
       });
 
-    })
-
-    .catch(error => {
-
-      console.error(
-        "Erro ao carregar medicações:",
-        error
-      );
-
     });
-
 }
 
 
-/* =====================================================
-   SALVAR CONSULTA
-   ===================================================== */
-
+/* SALVAR CONSULTA */
 function salvar() {
 
   const paciente =
-    document.getElementById(
-      "paciente"
-    ).value;
+    document.getElementById("paciente").value;
 
   const diagnostico =
-    document.getElementById(
-      "diagnostico"
-    ).value;
+    document.getElementById("diagnostico").value;
 
   const medicacao =
-    document.getElementById(
-      "medicacao"
-    ).value;
+    document.getElementById("medicacao").value;
 
   const obs =
-    document.getElementById(
-      "obs"
-    ).value;
-
+    document.getElementById("obs").value;
 
   if (!paciente) {
-
-    alert(
-      "Selecione um paciente clicando em Atender."
-    );
-
+    alert("Selecione um paciente.");
     return;
   }
-
-
-  if (!medicacao) {
-
-    alert(
-      "Selecione uma medicação."
-    );
-
-    return;
-  }
-
 
   fetch("/consulta", {
 
@@ -535,642 +220,100 @@ function salvar() {
     },
 
     body: JSON.stringify({
-
       paciente,
       diagnostico,
       medicacao,
       obs
-
     })
 
   })
-
-  .then(r => r.json())
-
   .then(() => {
-
-    alert(
-      "✅ Consulta salva!"
-    );
-
-
-    document.getElementById(
-      "diagnostico"
-    ).value = "";
-
-
-    document.getElementById(
-      "medicacao"
-    ).value = "";
-
-
-    document.getElementById(
-      "obs"
-    ).value = "";
-
+    alert("✅ Consulta salva.");
   })
-
-  .catch(error => {
-
-    console.error(
-      "Erro ao salvar consulta:",
-      error
-    );
-
-    alert(
-      "❌ Erro ao salvar consulta."
-    );
-
+  .catch(() => {
+    alert("❌ Erro ao salvar.");
   });
-
 }
 
 
-/* =====================================================
-   GERAR PDF
-   ===================================================== */
-
+/* GERAR PDF */
 function gerarPDF() {
 
   const paciente =
-    document.getElementById(
-      "paciente"
-    ).value.trim();
-
+    document.getElementById("paciente").value;
 
   const diagnostico =
-    document.getElementById(
-      "diagnostico"
-    ).value.trim();
-
+    document.getElementById("diagnostico").value;
 
   const medicacao =
-    document.getElementById(
-      "medicacao"
-    ).value.trim();
-
+    document.getElementById("medicacao").value;
 
   const obs =
-    document.getElementById(
-      "obs"
-    ).value.trim();
-
-
-  const consultorio =
-    document.getElementById(
-      "consultorio-num"
-    ).value || "01";
-
-
-  /* ===================================================
-     VALIDAR PACIENTE
-     =================================================== */
+    document.getElementById("obs").value;
 
   if (!paciente) {
-
-    alert(
-      "Selecione um paciente clicando em Atender."
-    );
-
+    alert("Selecione um paciente.");
     return;
-
   }
 
+  const { jsPDF } = window.jspdf;
 
-  /* ===================================================
-     CRIAR PDF
-     =================================================== */
-
-  const {
-    jsPDF
-  } = window.jspdf;
-
-
-  const pdf =
-    new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4"
-    });
-
-
-  const largura =
-    pdf.internal.pageSize.getWidth();
-
-  const altura =
-    pdf.internal.pageSize.getHeight();
-
-
-  const margem = 20;
+  const pdf = new jsPDF();
 
   let y = 20;
 
+  pdf.setFontSize(18);
+  pdf.text("PAINEL MÉDICO", 105, y, {
+    align: "center"
+  });
 
-  /* ===================================================
-     CABEÇALHO
-     =================================================== */
+  y += 15;
 
-  pdf.setFillColor(
-    41,
-    128,
-    185
-  );
+  pdf.setFontSize(12);
 
-  pdf.rect(
-    0,
-    0,
-    largura,
-    35,
-    "F"
-  );
-
-
-  pdf.setTextColor(
-    255,
-    255,
-    255
-  );
-
-
-  pdf.setFont(
-    "helvetica",
-    "bold"
-  );
-
-  pdf.setFontSize(20);
-
-
-  pdf.text(
-    "PAINEL MÉDICO",
-    largura / 2,
-    15,
-    {
-      align: "center"
-    }
-  );
-
-
-  pdf.setFont(
-    "helvetica",
-    "normal"
-  );
-
-  pdf.setFontSize(11);
-
-
-  pdf.text(
-    "Formulário de Atendimento Médico",
-    largura / 2,
-    23,
-    {
-      align: "center"
-    }
-  );
-
-
-  pdf.text(
-    "Registro de Consulta",
-    largura / 2,
-    30,
-    {
-      align: "center"
-    }
-  );
-
-
-  /* ===================================================
-     POSIÇÃO INICIAL
-     =================================================== */
-
-  y = 48;
-
-
-  pdf.setTextColor(
-    0,
-    0,
-    0
-  );
-
-
-  /* ===================================================
-     FUNÇÃO CAMPO
-     =================================================== */
-
-  function campo(
-    titulo,
-    valor,
-    x,
-    larguraCampo
-  ) {
-
-    pdf.setFont(
-      "helvetica",
-      "bold"
-    );
-
-    pdf.setFontSize(9);
-
-    pdf.setTextColor(
-      80,
-      80,
-      80
-    );
-
-
-    pdf.text(
-      titulo,
-      x,
-      y
-    );
-
-
-    pdf.setFont(
-      "helvetica",
-      "normal"
-    );
-
-    pdf.setFontSize(11);
-
-    pdf.setTextColor(
-      0,
-      0,
-      0
-    );
-
-
-    pdf.text(
-      valor || "Não informado",
-      x,
-      y + 7
-    );
-
-
-    pdf.setDrawColor(
-      180,
-      180,
-      180
-    );
-
-
-    pdf.line(
-      x,
-      y + 9,
-      x + larguraCampo,
-      y + 9
-    );
-
-  }
-
-
-  /* ===================================================
-     PACIENTE
-     =================================================== */
-
-  campo(
-    "PACIENTE",
-    paciente,
-    margem,
-    105
-  );
-
-
-  campo(
-    "CONSULTÓRIO",
-    consultorio,
-    140,
-    50
-  );
-
-
-  y += 25;
-
-
-  /* ===================================================
-     DATA
-     =================================================== */
-
-  const agora =
-    new Date();
-
-
-  const data =
-    agora.toLocaleDateString(
-      "pt-BR"
-    );
-
-
-  const hora =
-    agora.toLocaleTimeString(
-      "pt-BR",
-      {
-        hour: "2-digit",
-        minute: "2-digit"
-      }
-    );
-
-
-  campo(
-    "DATA DO ATENDIMENTO",
-    data + " - " + hora,
-    margem,
-    170
-  );
-
-
-  y += 25;
-
-
-  /* ===================================================
-     FUNÇÃO ÁREA DE TEXTO
-     =================================================== */
-
-  function areaTexto(
-    titulo,
-    texto,
-    alturaMinima
-  ) {
-
-    pdf.setFont(
-      "helvetica",
-      "bold"
-    );
-
-    pdf.setFontSize(10);
-
-    pdf.setTextColor(
-      50,
-      50,
-      50
-    );
-
-
-    pdf.text(
-      titulo,
-      margem,
-      y
-    );
-
-
-    y += 5;
-
-
-    const larguraTexto =
-      largura - (
-        margem * 2
-      );
-
-
-    const linhas =
-      pdf.splitTextToSize(
-        texto || "Não informado",
-        larguraTexto - 8
-      );
-
-
-    const alturaTexto =
-      Math.max(
-        alturaMinima,
-        (linhas.length * 5) + 10
-      );
-
-
-    pdf.setDrawColor(
-      120,
-      120,
-      120
-    );
-
-
-    pdf.rect(
-      margem,
-      y,
-      larguraTexto,
-      alturaTexto
-    );
-
-
-    pdf.setFont(
-      "helvetica",
-      "normal"
-    );
-
-    pdf.setFontSize(10);
-
-    pdf.setTextColor(
-      0,
-      0,
-      0
-    );
-
-
-    pdf.text(
-      linhas,
-      margem + 4,
-      y + 7
-    );
-
-
-    y += alturaTexto + 12;
-
-  }
-
-
-  /* ===================================================
-     DIAGNÓSTICO
-     =================================================== */
-
-  areaTexto(
-    "DIAGNÓSTICO",
-    diagnostico,
-    25
-  );
-
-
-  /* ===================================================
-     MEDICAÇÃO
-     =================================================== */
-
-  areaTexto(
-    "MEDICAÇÃO / PRESCRIÇÃO",
-    medicacao,
-    25
-  );
-
-
-  /* ===================================================
-     OBSERVAÇÕES
-     =================================================== */
-
-  areaTexto(
-    "OBSERVAÇÕES",
-    obs,
-    35
-  );
-
-
-  /* ===================================================
-     ASSINATURA
-     =================================================== */
-
-  if (
-    y > altura - 55
-  ) {
-
-    pdf.addPage();
-
-    y = 25;
-
-  }
-
-
+  pdf.text("Paciente: " + paciente, 20, y);
   y += 10;
 
+  pdf.text("Diagnóstico: " + (diagnostico || "Não informado"), 20, y);
+  y += 10;
 
-  const larguraAssinatura =
-    70;
+  pdf.text("Medicação: " + (medicacao || "Não informado"), 20, y);
+  y += 10;
 
+  pdf.text("Observações:", 20, y);
+  y += 7;
 
-  pdf.setDrawColor(
-    0,
-    0,
-    0
-  );
+  const linhas =
+    pdf.splitTextToSize(
+      obs || "Nenhuma",
+      170
+    );
 
+  pdf.text(linhas, 20, y);
 
-  pdf.line(
-    margem,
-    y,
-    margem + larguraAssinatura,
+  y += linhas.length * 6 + 15;
+
+  pdf.text(
+    "Data: " +
+    new Date().toLocaleDateString("pt-BR"),
+    20,
     y
   );
-
-
-  pdf.setFont(
-    "helvetica",
-    "bold"
-  );
-
-  pdf.setFontSize(9);
-
-
-  pdf.text(
-    "Assinatura do Médico",
-    margem + (
-      larguraAssinatura / 2
-    ),
-    y + 6,
-    {
-      align: "center"
-    }
-  );
-
-
-  /* ===================================================
-     DATA DA ASSINATURA
-     =================================================== */
-
-  const xData =
-    largura - margem - 60;
-
-
-  pdf.line(
-    xData,
-    y,
-    xData + 60,
-    y
-  );
-
-
-  pdf.text(
-    "Data",
-    xData + 30,
-    y + 6,
-    {
-      align: "center"
-    }
-  );
-
-
-  /* ===================================================
-     RODAPÉ
-     =================================================== */
-
-  pdf.setFont(
-    "helvetica",
-    "normal"
-  );
-
-  pdf.setFontSize(8);
-
-  pdf.setTextColor(
-    100,
-    100,
-    100
-  );
-
-
-  pdf.text(
-    "Formulário gerado pelo Painel Médico",
-    largura / 2,
-    altura - 12,
-    {
-      align: "center"
-    }
-  );
-
-
-  /* ===================================================
-     NOME DO ARQUIVO
-     =================================================== */
-
-  const nomeArquivo =
-    paciente
-      .replace(
-        /[^a-zA-Z0-9À-ÿ ]/g,
-        ""
-      )
-      .replace(
-        /\s+/g,
-        "_"
-      );
-
 
   pdf.save(
     "Consulta_" +
-    nomeArquivo +
-    "_" +
-    data.replace(
-      /\//g,
-      "-"
-    ) +
+    paciente.replace(/\s+/g, "_") +
     ".pdf"
   );
-
-
-  alert(
-    "✅ PDF gerado com sucesso!"
-  );
-
 }
 
 
-/* =====================================================
-   INICIALIZAÇÃO
-   ===================================================== */
-
+/* INICIAR */
 carregar();
-
 carregarMedicacoes();
 
-
-/* =====================================================
-   ATUALIZAR FILA
-   ===================================================== */
-
-setInterval(
-  carregar,
-  10000
-);
+/* ATUALIZAR FILA */
+setInterval(carregar, 10000);
 
 </script>
 

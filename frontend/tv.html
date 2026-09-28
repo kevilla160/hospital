@@ -7,7 +7,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
 
     body {
-      background-color: #5c4033;
+      background-color: #d8c4e8;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -37,8 +37,8 @@
     }
 
     .box {
-      background-color: #63d4f4;
-      border: 6px solid #b39b82;
+      background-color: #c9a9e9;
+      border: 6px solid #a98bc4;
       border-radius: 15px;
       padding: 20px;
       display: flex;
@@ -60,12 +60,14 @@
 
     /* Painel esquerdo - local (guichê ou consultório) */
     .local-box { flex: 1; }
+
     .local-number {
-      color: #d12c2c;
+      color: #713f8c;
       font-size: 9vw;
       font-weight: bold;
       line-height: 1;
     }
+
     .local-type {
       color: #555;
       font-size: 1.8vw;
@@ -79,15 +81,21 @@
       justify-content: flex-start;
       align-items: flex-start;
     }
-    .history-box .box-title { font-size: 1.8vw; align-self: center; }
+
+    .history-box .box-title {
+      font-size: 1.8vw;
+      align-self: center;
+    }
+
     #history-list {
       list-style: none;
       width: 100%;
-      color: #d12c2c;
+      color: #713f8c;
       font-size: 1.5vw;
       font-weight: bold;
       text-align: left;
     }
+
     #history-list li {
       margin-bottom: 8px;
       border-bottom: 1px solid rgba(0,0,0,0.1);
@@ -96,8 +104,9 @@
 
     /* Painel direito - nome do paciente */
     .patient-box { flex: 3; }
+
     .patient-name {
-      color: #d12c2c;
+      color: #713f8c;
       font-size: 6.5vw;
       font-weight: bold;
       line-height: 1.2;
@@ -106,8 +115,9 @@
 
     /* Logo */
     .logo-box { flex: 1; }
+
     .logo-text {
-      color: #8c3b7a;
+      color: #713f8c;
       font-size: 3.5vw;
       font-weight: bold;
       text-transform: uppercase;
@@ -118,76 +128,160 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.3; }
     }
+
     .flash { animation: flash 0.5s ease 3; }
   </style>
 </head>
+
 <body>
 
 <!-- Estrutura da tela da TV criada para exibir o local e o nome do paciente chamado -->
 <div class="tv-container">
+
   <div class="left-panel">
+
     <div class="box local-box">
-      <div class="box-title" id="local-tipo">GUICHÊ</div>
-      <div class="local-number" id="local-numero">--</div>
+
+      <div class="box-title" id="local-tipo">
+        GUICHÊ
+      </div>
+
+      <div class="local-number" id="local-numero">
+        --
+      </div>
+
     </div>
+
     <div class="box history-box">
-      <div class="box-title">ÚLTIMAS CHAMADAS</div>
+
+      <div class="box-title">
+        ÚLTIMAS CHAMADAS
+      </div>
+
       <ul id="history-list"></ul>
+
     </div>
+
   </div>
+
+
   <div class="right-panel">
+
     <div class="box patient-box">
-      <div class="box-title">PACIENTE</div>
-      <div class="patient-name" id="patient-name">AGUARDANDO...</div>
+
+      <div class="box-title">
+        PACIENTE
+      </div>
+
+      <div class="patient-name" id="patient-name">
+        AGUARDANDO...
+      </div>
+
     </div>
+
     <div class="box logo-box">
-      <div class="logo-text">🏥 Sistema Hospitalar</div>
+
+      <div class="logo-text">
+        🏥 Sistema Hospitalar
+      </div>
+
     </div>
+
   </div>
+
 </div>
 
+
 <script>
+
 let ultimoId = null;
 
 // Função criada para buscar a chamada atual e o histórico da TV em tempo real.
 function atualizar() {
+
   fetch("/tv/chamada")
+
     .then(r => r.json())
+
     .then(data => {
+
       const chamada = data.chamada;
       const historico = data.historico || [];
 
       if (chamada) {
-        document.getElementById("local-tipo").innerText = chamada.localTipo || "GUICHÊ";
-        document.getElementById("local-numero").innerText = chamada.localNumero || "--";
-        document.getElementById("patient-name").innerText = chamada.paciente || "AGUARDANDO...";
+
+        document.getElementById("local-tipo").innerText =
+          chamada.localTipo || "GUICHÊ";
+
+        document.getElementById("local-numero").innerText =
+          chamada.localNumero || "--";
+
+        document.getElementById("patient-name").innerText =
+          chamada.paciente || "AGUARDANDO...";
+
 
         // Flash visual quando há chamada nova
         if (chamada.id !== ultimoId) {
+
           ultimoId = chamada.id;
-          const patientBox = document.querySelector(".patient-box");
+
+          const patientBox =
+            document.querySelector(".patient-box");
+
           patientBox.classList.remove("flash");
-          void patientBox.offsetWidth; // reflow
+
+          void patientBox.offsetWidth;
+
           patientBox.classList.add("flash");
+
         }
+
       }
 
+
       // Histórico
-      const list = document.getElementById("history-list");
+      const list =
+        document.getElementById("history-list");
+
       list.innerHTML = "";
+
+
       historico.slice(0, 4).forEach(h => {
-        const li = document.createElement("li");
-        const tipo = h.localTipo ? h.localTipo.substring(0,4) : "GUIC";
-        li.innerText = `${tipo}. ${h.localNumero} - ${h.paciente}`;
+
+        const li =
+          document.createElement("li");
+
+        const tipo =
+          h.localTipo
+            ? h.localTipo.substring(0,4)
+            : "GUIC";
+
+        li.innerText =
+          `${tipo}. ${h.localNumero} - ${h.paciente}`;
+
         list.appendChild(li);
+
       });
+
     })
-    .catch(err => console.log("Erro ao buscar chamada:", err));
+
+    .catch(err =>
+      console.log(
+        "Erro ao buscar chamada:",
+        err
+      )
+    );
 }
+
 
 // Polling a cada 2 segundos
 atualizar();
-setInterval(atualizar, 2000);
+
+setInterval(
+  atualizar,
+  2000
+);
+
 </script>
 
 </body>
